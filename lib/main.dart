@@ -1,4 +1,9 @@
+import 'package:brazilian_real_to_cents_converter/model/bag_of_coins.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'bloc/converter_bloc.dart';
+
 
 void main() => runApp(MyApp());
 
@@ -7,49 +12,107 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Simple brazilian real converter.',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: ConverterPage(title: 'Brazilian real to coin converter'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class ConverterPage extends StatelessWidget {
   final String title;
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
+  ConverterPage({Key key, this.title}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: Text(title),
       ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 50),
-          child: TextField(
-            textInputAction: TextInputAction.go,
-            decoration: InputDecoration(
-              hintText: "Enter a brazilian real value",
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              suffixIcon: Icon(Icons.arrow_forward),
-            ),
-          ),
-        )
-      ) 
+      // BlocProvider is an InheritedWidget for Blocs
+      body: BlocProvider(
+        // This bloc can now be accessed from CityInputField
+        // It is now automatically disposed (since 0.17.0)
+        builder: (context) => ConverterBloc(),
+        child: ConverterPageChild(),
+      ),
     );
+  }
+}
+
+class ConverterPageChild extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+       padding: EdgeInsets.symmetric(vertical: 16),
+       alignment: Alignment.center,
+       child: BlocBuilder(
+         bloc: BlocProvider.of<ConverterBloc>(context),
+         builder: (BuildContext context, ConverterState state) {
+            if (state is ConvertedValue){
+              return buildColumnWithCoins(state.bagOfCoins);
+            } else {// ConverterInitial
+              return buildInitialInput();
+            }
+          },
+       )
+    );
+  }
+
+  Widget buildInitialInput() {
+    return Center(
+      child: ValueInputField(),
+    );
+  }
+
+  Column buildColumnWithCoins(BagOfCoins bagOfCoins) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: <Widget>[
+        ValueInputField(),
+        Text(
+          "${bagOfCoins.fiftyCentsCoins} coin(s) of 50 cents"),
+        Text("${bagOfCoins.twentyFiveCentsCoins} coin(s) of 25 cents"),
+        Text("${bagOfCoins.tenCentsCoins} coin(s) of 10 cents"),
+        Text("${bagOfCoins.fiveCentsCoins} coin(s) of 5 cents"),
+        Text("${bagOfCoins.oneCentCoins} coin(s) of 1 cent"),
+      ],
+    );
+  }
+}
+
+class ValueInputField extends StatefulWidget {
+  const ValueInputField({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _ValueInputFieldState createState() => _ValueInputFieldState();
+}
+
+class _ValueInputFieldState extends State<ValueInputField> {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 50),
+      child: TextField(
+        onSubmitted: submitBrazilianRealValue,
+        textInputAction: TextInputAction.go,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          hintText: "Enter a brazilian real value",
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          suffixIcon: Icon(Icons.arrow_forward),
+        ),
+      ),
+    );
+  }
+
+  void submitBrazilianRealValue(String value) {
+    double doubleValue = double.parse(value);
+
+    final weatherBloc = BlocProvider.of<ConverterBloc>(context);
+    weatherBloc.dispatch(ConvertRealToCents(doubleValue));
   }
 }
