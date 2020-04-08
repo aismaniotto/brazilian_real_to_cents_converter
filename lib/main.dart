@@ -71,12 +71,18 @@ class ConverterPageChild extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         ValueInputField(),
-        Text(
-          "${bagOfCoins.fiftyCentsCoins} coin(s) of 50 cents"),
-        Text("${bagOfCoins.twentyFiveCentsCoins} coin(s) of 25 cents"),
-        Text("${bagOfCoins.tenCentsCoins} coin(s) of 10 cents"),
-        Text("${bagOfCoins.fiveCentsCoins} coin(s) of 5 cents"),
-        Text("${bagOfCoins.oneCentCoins} coin(s) of 1 cent"),
+        Text("Total of coins: ${
+          bagOfCoins.fiftyCentsCoins + 
+          bagOfCoins.twentyFiveCentsCoins + 
+          bagOfCoins.tenCentsCoins   + 
+          bagOfCoins.fiveCentsCoins + 
+          bagOfCoins.oneCentCoins 
+          }"),
+        if (bagOfCoins.fiftyCentsCoins > 0) Text("${bagOfCoins.fiftyCentsCoins} coin(s) of 50 cents"),
+        if (bagOfCoins.twentyFiveCentsCoins > 0) Text("${bagOfCoins.twentyFiveCentsCoins} coin(s) of 25 cents"),
+        if (bagOfCoins.tenCentsCoins > 0) Text("${bagOfCoins.tenCentsCoins} coin(s) of 10 cents"),
+        if (bagOfCoins.fiveCentsCoins > 0) Text("${bagOfCoins.fiveCentsCoins} coin(s) of 5 cents"),
+        if (bagOfCoins.oneCentCoins > 0) Text("${bagOfCoins.oneCentCoins} coin(s) of 1 cent"),
       ],
     );
   }

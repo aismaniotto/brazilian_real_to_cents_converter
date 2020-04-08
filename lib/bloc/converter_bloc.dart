@@ -22,27 +22,15 @@ class ConverterBloc extends Bloc<ConverterEvent, ConverterState> {
 
   BagOfCoins _convertBrazilianRealToCoin(double brazilianRealValue){
     int integerValue = (brazilianRealValue * 100).round();
-    int qtd50cents = 0;
-    int qtd25cents = 0;
-    int qtd10cents = 0;
-    int qtd5cents = 0;
-    int qtd1cent = 0;
-    
-    qtd50cents = (integerValue / 50).truncate();
-    integerValue = integerValue % 50;
 
-    qtd25cents = (integerValue / 25).truncate();
-    integerValue = integerValue % 25;
+    List<int> coinsValues = [50, 25, 10, 5, 1];
+    List<int> coinsQtd = List<int>();
 
-    qtd10cents = (integerValue / 10).truncate();
-    integerValue = integerValue % 10;
+    for(int i = 0; i < coinsValues.length; i++){
+      coinsQtd.add((integerValue / coinsValues[i]).truncate());
+      integerValue = integerValue % coinsValues[i];
+    }
 
-    qtd5cents = (integerValue / 5).truncate();
-    integerValue = integerValue % 5;
-
-    qtd1cent = integerValue;
-
-    return BagOfCoins(qtd50cents, qtd25cents, qtd10cents, qtd5cents, qtd1cent);
-
+    return BagOfCoins(coinsQtd[0], coinsQtd[1], coinsQtd[2], coinsQtd[3], coinsQtd[4]);
   }
 }
